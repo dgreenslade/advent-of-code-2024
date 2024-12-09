@@ -25,14 +25,11 @@ def p1(data:str) -> int:
 
 def p2(data:str) -> int:
     score = 0
-    removed = re.findall(r"don\'t\(\)(.*?(?=do\(\))|.*)", data)
-    # for r in removed:
-    #     print(r)
-    #     print("-------")
-    cleaned = re.sub(r"don\'t\(\)(.*?(?=do\(\))|.*)", "", data)
-    # cleaned = re.sub(r"don\'t\(\).*?(do\(\)|$)", "", data)
-    matches = re.findall(r"mul\(\d+\,\d+\)", cleaned)
-    for match in matches:
+    # remove linebreaks as causing issues
+    data = re.sub(r"\n+", "", data)
+    dont_removed = re.sub(r"don\'t\(\)(.*?)(?=do\(\)|$)", "", data)
+    mul_matchets = re.findall(r"mul\(\d+\,\d+\)", dont_removed)
+    for match in mul_matchets:
         score += calculate_mul(match)
     return score
 
