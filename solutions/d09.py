@@ -10,7 +10,7 @@ def read_input(file: str) -> list:
     return data.strip()
 
 
-def format_sys(data:str) -> list:
+def format_sys(data:str) -> tuple[deque, dict]:
     """
     Returns two objects: empty and file_sys
     empty_idx = [idx1,idx2,...]
@@ -42,7 +42,7 @@ def score(file_sys:dict) -> int:
     return score
 
 
-def compress(file_sys:dict, empty:list) -> int:
+def compress(file_sys:dict, empty:list) -> dict:
     for obj in reversed(file_sys):
         if len(empty) > 0:
             for pos in range(len(file_sys[obj])):
