@@ -1,5 +1,6 @@
 import os
 import pathlib
+import copy
 from collections import deque
 
 
@@ -34,7 +35,7 @@ def format_sys(data:str) -> tuple[deque, dict]:
     return file_sys, empty
 
 
-def score(file_sys:dict) -> int:
+def checksum(file_sys:dict) -> int:
     score = 0
     for obj_id, positions in file_sys.items():
         for pos in positions:
@@ -51,6 +52,47 @@ def compress(file_sys:dict, empty:list) -> dict:
                     file_sys[obj].appendleft(empty.popleft())
         else:
             break
+    print(file_sys)
+    print(empty)
+    return file_sys
+
+
+def check_empty_block(empty: list, min_length: int, pos: int) -> tuple:
+    # Exit if reach empty list size
+    if pos >= len(empty):
+        return None, pos
+    length = 1 # starting length
+    orig_pos = pos
+    # Determine size for current empty block
+    for i in range(len(list(empty)[pos:]) - 1):
+        if empty[pos] == empty[pos+1] - 1 and empty[pos]:
+            length += 1
+            pos += 1
+        else:
+            break
+    # Return if empty block meets conditions
+    if length >= min_length:
+        return length, orig_pos
+    # If not, check next empty block
+    else:
+        pos += 1
+        return check_empty_block(empty, min_length, pos)
+
+
+def compress_whole(file_sys:dict, empty:list) -> dict:
+    empty = list(empty)
+    for obj, idxs in reversed(file_sys.items()):
+        if len(idxs) == 0:
+            pass
+        elif len(empty) > 0 and idxs[0] > empty[0]:
+            empty_found, pos = check_empty_block(empty, len(idxs), 0)
+            if empty_found and pos < idxs[0]:
+                pass
+                for i in range(len(idxs)):
+                    idxs.pop()
+                    idxs.appendleft(empty[pos])
+                    del empty[pos]
+            print(f"Moved obj {obj}")
     return file_sys
 
 
@@ -60,17 +102,19 @@ def p2(data:str) -> int:
 
 def main():
 
-    file = os.path.join(pathlib.Path(__file__).parent.resolve(), "../input", "d09.txt")
+    file = os.path.join(pathlib.Path(__file__).parent.resolve(), "../input", "d09s.txt")
     data = read_input(file)
 
     file_sys, empty = format_sys(data)
 
-    compressed = compress(file_sys, empty)
-    p1_score = score(compressed)
+    p1_file_sys = copy.deepcopy(file_sys)
+    compressed = compress(p1_file_sys, empty.copy())
+    p1_score = checksum(compressed)
     print(f"Part 1 score: {p1_score}")
 
-    
-    # p2_score = p2(data)
+    # p2_file_sys = copy.deepcopy(file_sys)
+    # compressed_whole = compress_whole(p2_file_sys, empty.copy())
+    # p2_score = checksum(compressed_whole)
     # print(f"Part 2 score: {p2_score}")
 
 
