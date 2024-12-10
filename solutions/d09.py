@@ -52,8 +52,6 @@ def compress(file_sys:dict, empty:list) -> dict:
                     file_sys[obj].appendleft(empty.popleft())
         else:
             break
-    print(file_sys)
-    print(empty)
     return file_sys
 
 
@@ -87,12 +85,10 @@ def compress_whole(file_sys:dict, empty:list) -> dict:
         elif len(empty) > 0 and idxs[0] > empty[0]:
             empty_found, pos = check_empty_block(empty, len(idxs), 0)
             if empty_found and pos < idxs[0]:
-                pass
                 for i in range(len(idxs)):
-                    idxs.pop()
-                    idxs.appendleft(empty[pos])
-                    del empty[pos]
-            print(f"Moved obj {obj}")
+                        idxs.pop()
+                        idxs.appendleft(empty[pos])
+                        del empty[pos]
     return file_sys
 
 
@@ -102,7 +98,7 @@ def p2(data:str) -> int:
 
 def main():
 
-    file = os.path.join(pathlib.Path(__file__).parent.resolve(), "../input", "d09s.txt")
+    file = os.path.join(pathlib.Path(__file__).parent.resolve(), "../input", "d09.txt")
     data = read_input(file)
 
     file_sys, empty = format_sys(data)
@@ -112,6 +108,9 @@ def main():
     p1_score = checksum(compressed)
     print(f"Part 1 score: {p1_score}")
 
+    ## Failed attempt.  Recursion gets longer as empty list gets more and more 
+    ## smaller blocks.  More recursion to find bigger spot.
+    ## Hits 1000 loop recursion limit.
     # p2_file_sys = copy.deepcopy(file_sys)
     # compressed_whole = compress_whole(p2_file_sys, empty.copy())
     # p2_score = checksum(compressed_whole)
