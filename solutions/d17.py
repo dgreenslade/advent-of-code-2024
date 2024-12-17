@@ -1,7 +1,5 @@
 import os
 import pathlib
-import copy
-from collections import deque
 
 
 def read_input(file: str) -> tuple[list, dict]:
@@ -19,83 +17,83 @@ def read_input(file: str) -> tuple[list, dict]:
     return program, registers
 
 
-class register():
+class Computer():
 
-    def __init__(program:list, registers:dict):
+    def __init__(self, program:list, registers:dict):
         self.pointer = 0
         self.output = []
         self.program = program
-        for k,v in registers.items():
-            self.k = v
+        self.a = registers["A"]
+        self.b = registers["B"]
+        self.c = registers["C"]
+        self.stop = False
         self.opcodes = {
-            0: self.adv(),
-            1: self.bxl(),
-            2: self.bst(),
-            3: self.jnz(),
-            4: self.bxc(),
-            5: self.out(),
-            6: self.bdv(),
-            7: self.cdv(),
-        },
+            0: self.adv,
+            1: self.bxl,
+            2: self.bst,
+            3: self.jnz,
+            4: self.bxc,
+            5: self.out,
+            6: self.bdv,
+            7: self.cdv,
+        }
         self.operands = {
-            0: 0,
-            1: 1,
-            2: 2,
-            3: 3,
-            4: self.a,
-            5: self.b,
-            6: self.c,
-            7: self.stop(),
-        },
-        self.stop():
-            return self.output
+            0: lambda: 0,
+            1: lambda: 1,
+            2: lambda: 2,
+            3: lambda: 3,
+            4: lambda: self.a,
+            5: lambda: self.b,
+            6: lambda: self.c,
+            7: self.stop_fn()
+        }
     
+    def stop_fn(self):
+        self.stop = True
 
+    def adv(self):
+        self.a =  int(self.a / (2 ^ self.program[self.pointer+1]))
+        self.pointer += 2
 
+    def bxl(self):
+        self.b = self.b ^ self.program[self.pointer+1]
+        self.pointer += 2
 
-    def adv(operand):
-        out = self.a / (2 ^ operand)
-        out = round(out)
-        self.a = out
+    def bst(self):
+        self.b = self.program[self.pointer+1] % 8
+        self.pointer += 2
 
-    def bxl(operand):
-        return self.b ^ self.operands(operand)
-
-    def bst(operand):
-        out = operand % 8
-        self.b = out
-    
-
-    def jnz(operand):
+    def jnz(self):
         if self.a == 0:
             pass
         else:
-            self.pointer = self.operand
+            self.pointer = self.program[self.pointer+1]
 
-    def bxc():
-        out = self.b ^ self.c
-        self.b = out
+    def bxc(self):
+        result = self.b ^ self.c
+        self.b = result
+        self.pointer += 2
 
-    def out():
-        out = operand % 8
-        self.output.append(out)
+    def out(self):
+        print(self.program[self.pointer+1])
+        print(self.operands)
+        self.operands[self.program[self.pointer+1]]
+        self.output.append(self.operands[self.program[self.pointer+1]]() % 8)
 
-    def bdv():
-        out = self.a / (2 ^ operand)
-        out = round(out)
-        self.b = out
+    def bdv(self):
+        self.b = int(self.a / (2 ^ self.program[self.pointer+1]))
+        self.pointer += 2
 
-    def cdv():
-        out = self.a / (2 ^ operand)
-        out = round(out)
-        self.c = out
+    def cdv(self):
+        self.c = int(self.a / (2 ^ self.program[self.pointer+1]))
+        self.pointer += 2    
 
-    
-
-
-class program():
-
-    def __init__():
+    def process(self):
+        while self.pointer < len(self.program) and self.stop == False:
+            print(self.pointer)
+            print(self.program)
+            self.opcodes[self.program[self.pointer]]()
+        return self.output
 
 
 def p1(data:str) -> int:
@@ -109,8 +107,15 @@ def p2(data:str) -> int:
 def main():
 
     file = os.path.join(pathlib.Path(__file__).parent.resolve(), "../input", "d17s.txt")
+
     program, registers = read_input(file)
     print(program)
     print(registers)
+
+    computer = Computer(program, registers)
+    computer.process()
+    print(computer.output)
+
+
 if __name__ == "__main__":
     main()
