@@ -45,14 +45,15 @@ class Computer():
             4: lambda: self.a,
             5: lambda: self.b,
             6: lambda: self.c,
-            7: self.stop_fn()
+            7: self.stop_fn
         }
     
     def stop_fn(self):
         self.stop = True
 
     def adv(self):
-        self.a =  int(self.a / (2 ^ self.program[self.pointer+1]))
+        combo = self.operands[self.program[self.pointer+1]]()
+        self.a =  int(self.a / (2 ^ combo))
         self.pointer += 2
 
     def bxl(self):
@@ -60,14 +61,17 @@ class Computer():
         self.pointer += 2
 
     def bst(self):
-        self.b = self.program[self.pointer+1] % 8
+        combo = self.operands[self.program[self.pointer+1]]()
+        self.b = combo % 8
         self.pointer += 2
 
     def jnz(self):
         if self.a == 0:
-            pass
+            self.pointer += 2
         else:
-            self.pointer = self.program[self.pointer+1]
+            combo = self.operands[self.program[self.pointer + 1]]()
+            print(f"Resetting pointer from {self.pointer} to {combo}")
+            self.pointer = combo
 
     def bxc(self):
         result = self.b ^ self.c
@@ -77,22 +81,36 @@ class Computer():
     def out(self):
         print(self.program[self.pointer+1])
         print(self.operands)
-        self.operands[self.program[self.pointer+1]]
-        self.output.append(self.operands[self.program[self.pointer+1]]() % 8)
+        combo = self.operands[self.program[self.pointer+1]]()
+        self.output.append(combo % 8)
+        self.pointer += 2
+
 
     def bdv(self):
-        self.b = int(self.a / (2 ^ self.program[self.pointer+1]))
+        combo = self.operands[self.program[self.pointer+1]]()
+        self.b =  int(self.a / (2 ^ combo))
         self.pointer += 2
 
     def cdv(self):
-        self.c = int(self.a / (2 ^ self.program[self.pointer+1]))
-        self.pointer += 2    
+        combo = self.operands[self.program[self.pointer+1]]()
+        self.c =  int(self.a / (2 ^ combo))
+        self.pointer += 2
 
     def process(self):
-        while self.pointer < len(self.program) and self.stop == False:
+        print("Starting program")
+        print(self.pointer)
+        print(len(self.program))
+        print(self.stop)
+        while self.stop  == False:
+            print("condition met, proceeding")
             print(self.pointer)
-            print(self.program)
+            print(self.stop)
+            print(f"Contition: {self.pointer  +1} >= {len(self.program)}")
+            if self.pointer + 1 >= len(self.program):
+                self.stop = True
+                break
             self.opcodes[self.program[self.pointer]]()
+        print("processing completed")
         return self.output
 
 
@@ -109,10 +127,9 @@ def main():
     file = os.path.join(pathlib.Path(__file__).parent.resolve(), "../input", "d17s.txt")
 
     program, registers = read_input(file)
-    print(program)
-    print(registers)
 
     computer = Computer(program, registers)
+
     computer.process()
     print(computer.output)
 
