@@ -69,9 +69,9 @@ class Computer():
         if self.a == 0:
             self.pointer += 2
         else:
-            combo = self.operands[self.program[self.pointer + 1]]()
-            print(f"Resetting pointer from {self.pointer} to {combo}")
-            self.pointer = combo
+            literal = self.program[self.pointer + 1]
+            print(f"Resetting pointer from {self.pointer} to {literal}")
+            self.pointer = literal
 
     def bxc(self):
         result = self.b ^ self.c
@@ -98,14 +98,16 @@ class Computer():
 
     def process(self):
         print("Starting program")
+        loop = 1
         while self.stop  == False:
             if self.pointer + 1 >= len(self.program):
                 self.stop = True
+                print("processing completed")
                 break
-            print("condition met, proceeding")
-            print(f"using func {self.opcodes[self.pointer].__name__} with pointer {self.pointer} on operand {self.program[self.pointer]}")
+            print(f"Loop {loop} -- using func {self.opcodes[self.pointer].__name__} with pointer {self.pointer} on opcode {self.program[self.pointer]} and {self.program[self.pointer+1]}")
             self.opcodes[self.program[self.pointer]]()
-        print("processing completed")
+            loop += 1
+        
         return self.output
 
 
@@ -119,14 +121,16 @@ def p2(data:str) -> int:
 
 def main():
 
-    file = os.path.join(pathlib.Path(__file__).parent.resolve(), "../input", "d17s.txt")
+    file = os.path.join(pathlib.Path(__file__).parent.resolve(), "../input", "d17s3.txt")
 
     program, registers = read_input(file)
 
+    print(program, registers)
     computer = Computer(program, registers)
 
     computer.process()
     print(computer.output)
+    print(computer.a, computer.b, computer.c)
 
 
 if __name__ == "__main__":
