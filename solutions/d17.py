@@ -53,7 +53,7 @@ class Computer():
 
     def adv(self):
         combo = self.operands[self.program[self.pointer+1]]()
-        self.a =  int(self.a / (2 ^ combo))
+        self.a =  int(self.a / pow(2,combo))
         self.pointer += 2
 
     def bxl(self):
@@ -70,7 +70,7 @@ class Computer():
             self.pointer += 2
         else:
             literal = self.program[self.pointer + 1]
-            print(f"Resetting pointer from {self.pointer} to {literal}")
+            # print(f"Resetting pointer from {self.pointer} to {literal}")
             self.pointer = literal
 
     def bxc(self):
@@ -82,29 +82,30 @@ class Computer():
         combo = self.operands[self.program[self.pointer+1]]()
         out = combo % 8
         self.output.append(out)
-        print(f"Outputting {out}")
+        # print(f"Outputting {out}")
         self.pointer += 2
-
 
     def bdv(self):
         combo = self.operands[self.program[self.pointer+1]]()
-        self.b =  int(self.a / (2 ^ combo))
+        self.b =  int(self.a / pow(2,combo))
         self.pointer += 2
 
     def cdv(self):
         combo = self.operands[self.program[self.pointer+1]]()
-        self.c =  int(self.a / (2 ^ combo))
+        self.c =  int(self.a / pow(2,combo))
         self.pointer += 2
 
     def process(self):
-        print("Starting program")
         loop = 1
         while self.stop  == False:
             if self.pointer + 1 >= len(self.program):
                 self.stop = True
                 print("processing completed")
                 break
-            print(f"Loop {loop} -- using func {self.opcodes[self.pointer].__name__} with pointer {self.pointer} on opcode {self.program[self.pointer]} and {self.program[self.pointer+1]}")
+            print(f"Loop {loop} -- using func \
+                {self.opcodes[self.program[self.pointer]].__name__} \
+                with pointer {self.pointer} on opcode {self.program[self.pointer]} \
+                and {self.program[self.pointer+1]}")
             self.opcodes[self.program[self.pointer]]()
             loop += 1
         
@@ -121,16 +122,17 @@ def p2(data:str) -> int:
 
 def main():
 
-    file = os.path.join(pathlib.Path(__file__).parent.resolve(), "../input", "d17s3.txt")
+    file = os.path.join(pathlib.Path(__file__).parent.resolve(), "../input", "d17.txt")
 
     program, registers = read_input(file)
 
-    print(program, registers)
-    computer = Computer(program, registers)
+    # Part 1
+    print(f"Program: {program}, registers: {registers}")
 
-    computer.process()
-    print(computer.output)
-    print(computer.a, computer.b, computer.c)
+    computer = Computer(program, registers)
+    output = computer.process()
+    print(f"Registers: {computer.a, computer.b, computer.c}")
+    print(",".join([str(x) for x in output]))
 
 
 if __name__ == "__main__":
